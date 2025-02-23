@@ -1,0 +1,26 @@
+{
+  "name": "fc-2025-2",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrCatman137/fc-2025-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrCatman137/fc-2025-2/issues"
+  },
+  "homepage": "https://github.com/MrCatman137/fc-2025-2#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  }
+}

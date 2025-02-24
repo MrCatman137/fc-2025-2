@@ -5,6 +5,7 @@ const fs = require("fs");
 const app = express();
 
 app.use(express.json())
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/test", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "test", "test.html"))
@@ -55,7 +56,7 @@ app.post("/answers/:id", (req, res) => {
                 return res.status(500).json({ error: "Failed to write JSON file" });
             }
 
-            res.redirect(303, `/answers`);
+            res.status(201).json({ message: "Answers saved"});
         })
     })
     

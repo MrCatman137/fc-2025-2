@@ -15,7 +15,7 @@ app.get("/questions", (req, res) => {
     
     fs.readFile(questJSON, "utf8", (err, data) => {
         if (err) {
-            return res.status(500).json({ error: "Failed to write JSON file" });
+            return res.status(500).json({ error: "Failed to read JSON file" });
         }
         
         const test = data? JSON.parse(data) : [];
@@ -27,11 +27,89 @@ app.get("/questions", (req, res) => {
 })
 
 app.post("/answers/:id", (req, res) => {
-    //відповідь сюди і перенаправлення на іншу сторінку 
+    const user_id = req.params.id;
+
+    const new_answers = req.body;
+
+    const answerJSON = path.join(__dirname, "user_answers.json")
+    
+    fs.readFile(answerJSON, "utf-8", (err, data) => {
+        let user_answers = []
+
+        if (err) {
+            return res.status(500).json({ error: "Failed to read JSON file" });
+        } else {
+            try {
+                user_answers = data? JSON.parse(data) : [];
+            } catch (error) {
+                return res.status(500).json({ error: "Failed to parse JSON file"});
+            }
+        }
+       
+        const user_answers_data = { user_id, answers: new_answers}
+
+        user_answers.push(user_answers_data);
+
+        fs.writeFile(answerJSON, JSON.stringify(user_answers, null, 2), (err) => {
+            if (err) {
+                return res.status(500).json({ error: "Failed to write JSON file" });
+            }
+
+            res.redirect(303, `/answers`);
+        })
+    })
+    
 })
 
 app.get("/answers/:id", (req, res) => {
-    //отримання відповідей
+    const user_id = req.params.id;
+
+    const answerJSON = path.join(__dirname, "user_answers.json")
+    const questJSON = path.join(__dirname, "test.json")
+    
+    fs.readFile(answerJSON, "utf-8", (err, answer_data) => {
+        let user_answers = []
+
+        if (err) {
+            return res.status(500).json({ error: "Failed to read JSON file" });
+        } else {
+            try {
+                user_answers = answer_data? JSON.parse(answer_data) : [];
+            } catch (error) {
+                return res.status(500).json({ error: "Failed to parse JSON file"});
+            }
+        }
+
+        const user_data = user_answers.filter((item) => item.user_id === user_id);
+
+        if (!user_data) {
+            return res.status(404).json({ error: "User not found or no answers provided" });
+        }
+
+        fs.readFile(questJSON, "utf-8", (err, test_data) => {
+            let test_answers = []
+
+            if (err) {
+                return res.status(500).json({ error: "Failed to read JSON file" });
+            } else {
+                try {
+                    test_answers = test_data? JSON.parse(test_data) : [];
+                } catch (error) {
+                    return res.status(500).json({ error: "Failed to parse JSON file"});
+                }
+            }
+
+            const correct_answer = test_answers.map(q => q.correct);
+
+            const correctness = user_data.answers.map((answer, index) => correct_answer[index] === answer)
+        
+            res.status(200).json({
+                user_id,
+                answers: user_data.answers,
+                correctness
+            })
+        })
+    })
 })
 
 app.get("/answers", (req, res) => {

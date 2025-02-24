@@ -1,12 +1,20 @@
 [
   {
-    "user_id": "someUserId",
+    "user_id": "qwerty",
+    "date": "2025-02-24T18:55:00.627Z",
     "answers": [
-      "Прозорий",
-      "Love",
-      "Книга рекордів Гіннеса",
-      "Змінивши логотип",
-      "666"
+      3,
+      1,
+      2,
+      0,
+      2
+    ],
+    "correctness": [
+      false,
+      false,
+      true,
+      false,
+      false
     ]
   }
 ]

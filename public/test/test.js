@@ -9,14 +9,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let questions = [];
     let currentIndex = 0;
-    let userAnswers = []; // Для збереження відповідей користувача
+    let userAnswers = []; 
 
     try {
         const response = await fetch("/questions");
         questions = await response.json();
         renderQuestions();
         renderQuestion(currentIndex);
-        loadFromLocalStorage(); // Завантаження збережених відповідей з LocalStorage
+        loadFromLocalStorage(); 
     } catch (error) {
         console.error("Failed to load questions", error);
     }
@@ -34,73 +34,72 @@ document.addEventListener("DOMContentLoaded", async () => {
     function renderQuestion(index) {
         currentIndex = index;
         const question = questions[index];
-
+    
         questionText.textContent = question.question;
         questionPicture.innerHTML = ""; 
-
+    
         const imgElement = document.createElement("img");
-        imgElement.src = `/photos/${question.svg}`;  // Шлях до фотографії
+        imgElement.src = `/photos/${question.svg}`;  
         imgElement.alt = "Question Image"; 
         questionPicture.appendChild(imgElement);
-
+    
         optionsContainer.innerHTML = "";
-
+    
         question.options.forEach((option, i) => {
             const optionLabel = document.createElement("label");
             const optionInput = document.createElement("input");
             optionInput.type = "radio";
             optionInput.name = `question-${index}`;
-            optionInput.value = option;
-            optionLabel.textContent = option;
-
-            // Якщо відповідь була вибрана раніше, відзначити відповідний варіант
-            if (userAnswers[index] === option) {
+            optionInput.value = i; 
+    
+            if (userAnswers[index] === i) {
                 optionInput.checked = true;
             }
-
-            optionInput.addEventListener("change", () => handleOptionChange(optionInput, index));
-
+    
+            optionInput.addEventListener("change", () => handleOptionChange(i, index));
+    
             optionLabel.appendChild(optionInput);
+            optionLabel.appendChild(document.createTextNode(option)); // Додаємо текст після input
             optionsContainer.appendChild(optionLabel);
         });
-
+    
         prevButton.style.display = index > 0 ? "inline-block" : "none";
         nextButton.style.display = index < questions.length - 1 ? "inline-block" : "none";
         finishButton.style.display = index === questions.length - 1 ? "inline-block" : "none";
     }
-
-    function handleOptionChange(selectedInput, questionIndex) {
+    
+    function handleOptionChange(selectedIndex, questionIndex) {
         const allLabels = optionsContainer.querySelectorAll("label");
         allLabels.forEach(label => label.classList.remove("selected"));
-
-        const selectedLabel = selectedInput.closest("label");
-        selectedLabel.classList.add("selected");
-
-        // Зберігаємо відповідь в масив userAnswers
-        userAnswers[questionIndex] = selectedInput.value;
-
-        // Збереження відповідей в LocalStorage
-        localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+    
+        const selectedInput = optionsContainer.querySelector(`input[value="${selectedIndex}"]`);
+        if (selectedInput) {
+            selectedInput.closest("label").classList.add("selected");
+        }
+    
+        userAnswers[questionIndex] = selectedIndex;
+    
+        localStorage.setItem("userAnswers", JSON.stringify(userAnswers));
     }
+    
 
     prevButton.addEventListener("click", () => renderQuestion(currentIndex - 1));
     nextButton.addEventListener("click", () => renderQuestion(currentIndex + 1));
 
     finishButton.addEventListener("click", () => {
-        // Надсилання результатів на сервер
         sendAnswersToServer();
     });
 
     function loadFromLocalStorage() {
         const savedAnswers = localStorage.getItem('userAnswers');
         if (savedAnswers) {
-            userAnswers = JSON.parse(savedAnswers); // Завантажуємо збережені відповіді
+            userAnswers = JSON.parse(savedAnswers); 
         }
     }
 
     async function sendAnswersToServer() {
         try {
-            const userId = "someUserId"; // Можна отримати користувача з сесії або іншого джерела
+            const userId = localStorage.getItem('userName'); 
             const response = await fetch(`/answers/${userId}`, {
                 method: 'POST',
                 headers: {
@@ -111,7 +110,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (response.ok) {
                 alert('Ваші відповіді успішно надіслані!');
-                // Можна додати редірект або іншу поведінку
             } else {
                 alert('Сталася помилка при надсиланні відповідей.');
             }

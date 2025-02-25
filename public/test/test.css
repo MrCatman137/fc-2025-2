@@ -28,6 +28,14 @@ body {
     background-color: #0056b3;
 }
 
+#layer-question button.active {
+    background-color: #2aaeec; 
+}
+
+#layer-question button.active:hover {
+    background-color: #00d9ff; 
+}
+
 #question-picture {
     display: flex;
     flex-direction: column;

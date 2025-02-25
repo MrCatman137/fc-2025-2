@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+        alert("You are not autorized.");
+        window.location.href = "/homepage";
+        return;
+    }
+
     const layerQuestion = document.getElementById("layer-question");
     const questionText = document.getElementById("question-text");
     const questionPicture = document.getElementById("question-picture");
@@ -10,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let questions = [];
     let currentIndex = 0;
     let userAnswers = []; 
+
 
     try {
         const response = await fetch("/questions");
@@ -27,6 +36,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const btn = document.createElement("button");
             btn.textContent = index + 1;
             btn.addEventListener("click", () => renderQuestion(index));
+            
+            if (index === currentIndex) {
+                btn.classList.add("active");
+            }
+
             layerQuestion.appendChild(btn);
         });
     }
@@ -35,6 +49,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentIndex = index;
         const question = questions[index];
     
+        const buttons = layerQuestion.querySelectorAll("button");
+        buttons.forEach((btn, i) => {
+            if (i === currentIndex) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
         questionText.textContent = question.question;
         questionPicture.innerHTML = ""; 
     
@@ -99,19 +122,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function sendAnswersToServer() {
         try {
-            const userId = localStorage.getItem('userName'); 
+            const userName = localStorage.getItem('userName'); 
+            const userId = localStorage.getItem('userId');
             const response = await fetch(`/answers/${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userAnswers)
+                body: JSON.stringify({userAnswers, userName})
             });
 
             if (response.ok) {
-                alert('Ваші відповіді успішно надіслані!');
+                window.location.href = "/answers";
             } else {
-                alert('Сталася помилка при надсиланні відповідей.');
+                alert('Error while sending answers.');
             }
         } catch (error) {
             console.error('Error sending answers:', error);

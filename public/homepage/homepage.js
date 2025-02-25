@@ -4,17 +4,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const storedName = localStorage.getItem("userName");
     if (storedName) {
-        nameInput.value = storedName; 
+        nameInput.value = storedName;
     }
 
-    startButton.addEventListener("click", () => {
+    startButton.addEventListener("click", async () => {
         const userName = nameInput.value.trim();
-        
-        if (userName) {
-            localStorage.setItem("userName", userName); 
-            window.location.href = "/test"; 
-        } else {
+
+        if (!userName) {
             alert("Будь ласка, введіть ім'я перед початком тесту!");
+            return;
+        }
+
+        try {
+            const response = await fetch("/user");
+            const data = await response.json();
+            const userId = data.user_id;
+
+            localStorage.setItem("userName", userName);
+            localStorage.setItem("userId", userId);
+
+            window.location.href = "/test";
+        } catch (error) {
+            console.error(error);
+            alert("Error, try again.");
         }
     });
 });

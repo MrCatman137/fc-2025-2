@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             optionInput.addEventListener("change", () => handleOptionChange(i, index));
     
             optionLabel.appendChild(optionInput);
-            optionLabel.appendChild(document.createTextNode(option)); // Додаємо текст після input
+            optionLabel.appendChild(document.createTextNode(option)); 
             optionsContainer.appendChild(optionLabel);
         });
     
